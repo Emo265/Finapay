@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - backend
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  service1:
+    build:
+      context: ./service1
+    container_name: service1
+    ports:
+      - "5001:5000"
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - backend
+
+  service2:
+    build:
+      context: ./service2
+    container_name: service2
+    ports:
+      - "5002:5000"
+    depends_on:
+      - mongodb
+      - redis
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
